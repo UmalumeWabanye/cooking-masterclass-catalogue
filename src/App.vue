@@ -9,7 +9,8 @@ const courses = [
     chef: 'Chef Mario Rossi',
     price: 59,
     level: 'Beginner',
-    available: true
+    available: true,
+    image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80'
   },
   {
     id: 2,
@@ -17,7 +18,8 @@ const courses = [
     chef: 'Chef Yuki Tanaka',
     price: 89,
     level: 'Advanced',
-    available: false
+    available: false,
+    image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=400&q=80'
   },
   {
     id: 3,
@@ -25,13 +27,16 @@ const courses = [
     chef: 'Chef Luc Moreau',
     price: 75,
     level: 'Intermediate',
-    available: true
+    available: true,
+    image: 'https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=400&q=80'
   }
 ]
 
 const wishlist = ref([])
 const showAvailableOnly = ref(false)
 const wishlistAnim = ref(false)
+const selectedCourse = ref(null)
+
 
 function addToWishlist(courseId) {
   if (!wishlist.value.includes(courseId)) {
@@ -39,6 +44,14 @@ function addToWishlist(courseId) {
     wishlistAnim.value = true
     setTimeout(() => wishlistAnim.value = false, 500)
   }
+}
+
+function viewCourse(course) {
+  selectedCourse.value = course
+}
+
+function closeCourseModal() {
+  selectedCourse.value = null
 }
 
 const filteredCourses = computed(() => {
@@ -79,9 +92,23 @@ const wishlistCourses = computed(() => {
         :price="course.price"
         :level="course.level"
         :available="course.available"
+        :image="course.image"
         @save="addToWishlist"
+        @click="viewCourse(course)"
+        style="cursor:pointer"
       />
     </section>
+    <div v-if="selectedCourse" class="course-modal">
+      <div class="course-modal-content">
+        <h2>{{ selectedCourse.title }}</h2>
+        <p><strong>Chef:</strong> {{ selectedCourse.chef }}</p>
+        <p><strong>Level:</strong> {{ selectedCourse.level }}</p>
+        <p><strong>Price:</strong> {{ new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR', minimumFractionDigits: 2 }).format(selectedCourse.price) }}</p>
+        <p v-if="selectedCourse.available" class="available">Available</p>
+        <p v-else class="sold-out">Sold Out</p>
+        <button @click="closeCourseModal">Close</button>
+      </div>
+    </div>
   </main>
 </template>
 
@@ -126,60 +153,6 @@ const wishlistCourses = computed(() => {
   display: flex;
   align-items: center;
   gap: 0.5em;
-}
-.wishlist-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-.wishlist-content {
-  background: #fff;
-  color: #213547;
-  border-radius: 1em;
-  box-shadow: 0 2px 24px #646cff33;
-  padding: 2em;
-  min-width: 320px;
-  max-width: 90vw;
-  @media (max-width: 600px) {
-    .cm-header {
-      flex-direction: column;
-      gap: 1em;
-      text-align: center;
-    }
-    .catalogue-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-}
-.wishlist-content h2 {
-  margin-top: 0;
-}
-.wishlist-content ul {
-  list-style: none;
-  padding: 0;
-}
-.wishlist-content li {
-  margin-bottom: 1em;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.wishlist-content button {
-  margin-left: 1em;
-  background: #646cff;
-  color: #fff;
-  border: none;
-  padding: 0.4em 1em;
-  border-radius: 0.5em;
-  font-size: 1em;
-  cursor: pointer;
 }
 .catalogue-grid {
   display: grid;
